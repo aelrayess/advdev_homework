@@ -1,4 +1,10 @@
 #!groovy
+def GUID      = "3dd7"
+
+// Set Development and Production Project Names
+def devProject  = "${GUID}-tasks-dev"
+def prodProject = "${GUID}-tasks-prod"
+
 podTemplate(
   label: "skopeo-pod",
   cloud: "openshift",
@@ -17,7 +23,7 @@ podTemplate(
   node('skopeo-pod') {
     // Define Maven Command to point to the correct
     // settings for our Nexus installation
-    def mvnCmd = "mvn -s ../nexus_settings.xml"
+    def mvnCmd = "mvn -s ../nexus_settings.xml -B"
 
     // Checkout Source Code.
     stage('Checkout Source') {
@@ -33,15 +39,15 @@ podTemplate(
       def version = getVersionFromPom("pom.xml")
 
       // TBD Set the tag for the development image: version + build number
-      def devTag  = ""
+      def devTag  = "0.0-0"
       // Set the tag for the production image: version
-      def prodTag = ""
+      def prodTag = "0.0"
 
       // Using Maven build the war file
       // Do not run tests in this step
       stage('Build war') {
         echo "Building version ${devTag}"
-
+        sh "${mvnCmd} clean package -DskipTests=true"
         // TBD: Execute Maven Build
       }
 
@@ -50,7 +56,7 @@ podTemplate(
       // Using Maven run the unit tests
       stage('Unit Tests') {
         echo "Running Unit Tests"
-
+        sh "${mvnCmd} test"
         // TBD: Execute Unit Tests
       }
 
