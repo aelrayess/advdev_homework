@@ -51,8 +51,11 @@ podTemplate(
         // TBD: Execute Maven Build
       }
 
-      //stage('Unit Test and Code Analysis') {
-        //parallel {
+      stage('Unit Test and Code Analysis') {
+        when {
+          branch 'master'
+        }
+        parallel {
           stage('Unit Tests') {
             steps {
               echo "Running Unit Tests"
@@ -67,8 +70,8 @@ podTemplate(
               // TBD: Execute Sonarqube Tests
             } 
           }
-        //}
-      //}
+        }
+      }
 
       // Publish the built war file to Nexus
       stage('Publish to Nexus') {
