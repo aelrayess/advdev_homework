@@ -55,7 +55,7 @@ podTemplate(
       stage('Unit Test and Code Analysis') {
         parallel {
           // Using Maven run the unit tests
-          'Unit Tests' {
+          stage('Unit Tests') {
             steps {
               echo "Running Unit Tests"
               sh "${mvnCmd} test"
@@ -64,7 +64,7 @@ podTemplate(
           }
 
           // Using Maven to call SonarQube for Code Analysis
-          'Code Analysis' {
+          stage('Code Analysis') {
             steps {
               echo "Running Code Analysis"
               // sh "${mvnCmd} admin:redhat -Dsonar.host.url=http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000/ -Dsonar.projectName=${JOB_BASE_NAME} -Dsonar.projectVersion=${devTag}"
