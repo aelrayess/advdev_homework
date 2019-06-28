@@ -58,9 +58,9 @@ podTemplate(
           // Using Maven run the unit tests
           stage('Unit Tests') {
             steps {
-             echo "Running Unit Tests"
-             sh "${mvnCmd} test"
-             // TBD: Execute Unit Tests
+              echo "Running Unit Tests"
+              sh "${mvnCmd} test"
+              // TBD: Execute Unit Tests
             }
           }
 
@@ -68,12 +68,13 @@ podTemplate(
           stage('Code Analysis') {
             steps {
               echo "Running Code Analysis"
-              sh "${mvnCmd} admin:redhat -Dsonar.host.url=http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000/ -Dsonar.projectName=${JOB_BASE_NAME} -Dsonar.projectVersion=${devTag}"
+              // sh "${mvnCmd} admin:redhat -Dsonar.host.url=http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000/ -Dsonar.projectName=${JOB_BASE_NAME} -Dsonar.projectVersion=${devTag}"
               // TBD: Execute Sonarqube Tests
             } 
           }
         }
       }
+
       // Publish the built war file to Nexus
       stage('Publish to Nexus') {
         echo "Publish to Nexus"
