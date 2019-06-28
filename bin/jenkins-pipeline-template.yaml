@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: tasks-pipeline-template
+objects:
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    name: "tasks-pipeline"
+  spec:
+    source:
+      type: "Git"
+      git:
+        uri: "${REPO}"
+    strategy:
+      type: "JenkinsPipeline"
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: openshift-tasks/Jenkinsfile
+        env:
+          - name: "GUID"
+            value: "${GUID}"
+          - name: "CLUSTER"
+            value: "${CLUSTER}"
+parameters:
+- name: REPO
+  displayName: REPO
+  description: repo
+  value: https://github.com/aelrayess/advdev_homework
+  required: true
+- name: GUID
+  displayName: GUID
+  description: guid
+  value: 3dd7
+  required: true
+- name: CLUSTER
+  displayName: CLUSTER
+  description: cluster
+  value: na311.openshift.opentlc.com
+  required: true
