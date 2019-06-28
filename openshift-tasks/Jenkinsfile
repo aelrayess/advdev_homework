@@ -39,9 +39,9 @@ podTemplate(
       def version = getVersionFromPom("pom.xml")
 
       // TBD Set the tag for the development image: version + build number
-      def devTag  = "0.0-0"
+      def devTag  = "${version}-" + currentBuild.number
       // Set the tag for the production image: version
-      def prodTag = "0.0"
+      def prodTag = "${version}"
 
       // Using Maven build the war file
       // Do not run tests in this step
@@ -51,19 +51,15 @@ podTemplate(
         // TBD: Execute Maven Build
       }
 
-      // TBD: The next two stages should run in parallel
       stage('Unit Test and Code Analysis') {
         parallel {
-          // Using Maven run the unit tests
           stage('Unit Tests') {
             steps {
               echo "Running Unit Tests"
               sh "${mvnCmd} test"
-              // TBD: Execute Unit Tests
             }
           }
 
-          // Using Maven to call SonarQube for Code Analysis
           stage('Code Analysis') {
             steps {
               echo "Running Code Analysis"
