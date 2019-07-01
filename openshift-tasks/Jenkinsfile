@@ -89,10 +89,10 @@ podTemplate(
       // Deploy the built image to the Development Environment.
       stage('Deploy to Dev') {
         echo "Deploying container image to Development Project"
-        sh "oc set env dc/tasks VERSION='${devTag} (tasks-dev)' -n ${GUID}-tasks-dev"
         script {
           openshift.withCluster() {
             openshift.withProject("${devProject}") {
+              sh "oc set env dc/tasks VERSION='${devTag} (tasks-dev)' -n ${GUID}-tasks-dev"
               openshift.set("image", "dc/tasks", "tasks=docker-registry.default.svc:5000/${devProject}/tasks:${devTag}")
 
               // Update the Config Map which contains the users for the Tasks application
