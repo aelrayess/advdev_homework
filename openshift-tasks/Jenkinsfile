@@ -108,7 +108,7 @@ podTemplate(
               def dc = openshift.selector("dc", "tasks").object()
               def dc_version = dc.status.latestVersion
               def rc = openshift.selector("rc", "tasks-${dc_version}").object()
-
+              dc.describe()
               echo "Waiting for ReplicationController tasks-${dc_version} to be ready"
               while (rc.spec.replicas != rc.status.readyReplicas) {
                 sleep 5
@@ -153,7 +153,7 @@ podTemplate(
               // Update the Image on the Production Deployment Config
               def dc = openshift.selector("dc/${destApp}").object()
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
-              
+              dc.describe()
               openshift.apply(dc)
               
               // Update Config Map in change config files changed in the source
@@ -167,8 +167,8 @@ podTemplate(
               def dc_prod = openshift.selector("dc", "${destApp}").object()
               def dc_version = dc_prod.status.latestVersion
               def rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
-              sh "oc set env dc/tasks VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-prod"
-              
+              //sh "oc set env dc/tasks VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-prod"
+
               echo "Waiting for ${destApp} to be ready"
               while (rc_prod.spec.replicas != rc_prod.status.readyReplicas) {
                 sleep 5
