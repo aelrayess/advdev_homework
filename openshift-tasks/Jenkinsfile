@@ -95,7 +95,6 @@ podTemplate(
               //sh "oc set env dc/tasks VERSION='${devTag} (tasks-dev)' -n ${GUID}-tasks-dev"
               openshift.set("image", "dc/tasks", "tasks=docker-registry.default.svc:5000/${devProject}/tasks:${devTag}")
               sh "oc set env dc/tasks VERSION='${devTag} (tasks-dev)' -n ${GUID}-tasks-dev"
-              //openshift.set("env", "dc/tasks", "VERSION='${devTag} (tasks-dev)")
 
               // Update the Config Map which contains the users for the Tasks application
               // (just in case the properties files changed in the latest commit)
@@ -142,13 +141,11 @@ podTemplate(
 
       stage('Blue/Green Production Deployment') {
         script {
-          sh "oc set env dc/tasks VERSION='${prodTag} (tasks-green)' -n ${GUID}-tasks-prod"
           openshift.withCluster() {
             openshift.withProject("${prodProject}") {
               activeApp = openshift.selector("route", "tasks").object().spec.to.name
               if (activeApp == "tasks-green") {
                 destApp = "tasks-blue"
-                sh "oc set env dc/tasks VERSION='${prodTag} (tasks-blue)' -n ${GUID}-tasks-prod"
               }
               echo "Active Application:      " + activeApp
               echo "Destination Application: " + destApp
@@ -189,6 +186,7 @@ podTemplate(
         script {
           openshift.withCluster() {
             openshift.withProject("${prodProject}") {
+              sh "oc set env dc/tasks VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-prod"
               def route = openshift.selector("route/tasks").object()
               route.spec.to.name="${destApp}"
               openshift.apply(route)
