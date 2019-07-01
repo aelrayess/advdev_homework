@@ -155,7 +155,7 @@ podTemplate(
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
               
               openshift.apply(dc)
-              sh "oc set env dc/tasks VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-prod"
+              
               // Update Config Map in change config files changed in the source
               openshift.selector("configmap", "${destApp}-config").delete()
               def configmap = openshift.create("configmap", "${destApp}-config", "--from-file=./configuration/application-users.properties", "--from-file=./configuration/application-roles.properties" )
@@ -167,6 +167,8 @@ podTemplate(
               def dc_prod = openshift.selector("dc", "${destApp}").object()
               def dc_version = dc_prod.status.latestVersion
               def rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
+              sh "oc set env dc/tasks VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-prod"
+              
               echo "Waiting for ${destApp} to be ready"
               while (rc_prod.spec.replicas != rc_prod.status.readyReplicas) {
                 sleep 5
