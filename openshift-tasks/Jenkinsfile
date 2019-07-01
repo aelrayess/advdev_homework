@@ -159,10 +159,11 @@ podTemplate(
 
               // Update the Image on the Production Deployment Config
               def dc = openshift.selector("dc/${destApp}").object()
+              openshift.apply(dc)
+
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
               dc.spec.template.spec.containers[0].env="VERSION=${prodTag} (${destApp})"
 
-              openshift.apply(dc)
 
               sh "oc set probe dc/${destApp} --readiness --get-url=http://:8080/ --initial-delay-seconds=30 --timeout-seconds=5 -n ${GUID}-tasks-prod"
               sh "oc set probe dc/${destApp} --liveness --get-url=http://:8080/ --initial-delay-seconds=60 --failure-threshold=5 --timeout-seconds=5 -n ${GUID}-tasks-prod"
