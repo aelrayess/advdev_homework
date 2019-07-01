@@ -93,8 +93,11 @@ podTemplate(
           openshift.withCluster() {
             openshift.withProject("${devProject}") {
               //sh "oc set env dc/tasks VERSION='${devTag} (tasks-dev)' -n ${GUID}-tasks-dev"
-              openshift.set("image", "dc/tasks", "tasks=docker-registry.default.svc:5000/${devProject}/tasks:${devTag}")
-              sh "oc set env dc/tasks VERSION='${devTag} (tasks-dev)' -n ${GUID}-tasks-dev"
+              def dc = openshift.selector("dc/tasks").object()
+              dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${devTag}"
+              //openshift.set("image", "dc/tasks", "tasks=docker-registry.default.svc:5000/${devProject}/tasks:${devTag}")
+              dc.spec.template.spec.containers[0].env="VERSION=${devTag} (tasks-dev)"
+              //sh "oc set env dc/tasks VERSION='${devTag} (tasks-dev)' -n ${GUID}-tasks-dev"
 
               // Update the Config Map which contains the users for the Tasks application
               // (just in case the properties files changed in the latest commit)
@@ -105,7 +108,7 @@ podTemplate(
               openshift.selector("dc", "tasks").rollout().latest();
 
               // Wait for application to be deployed
-              def dc = openshift.selector("dc", "tasks").object()
+              //def dc = openshift.selector("dc", "tasks").object()
               def dc_version = dc.status.latestVersion
               def rc = openshift.selector("rc", "tasks-${dc_version}").object()
               dc.describe()
@@ -153,7 +156,7 @@ podTemplate(
               // Update the Image on the Production Deployment Config
               def dc = openshift.selector("dc/${destApp}").object()
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
-              dc.describe()
+              dc.spec.template.spec.containers[0].env="VERSION='${prodTag} (${destApp})'"
               openshift.apply(dc)
               
               // Update Config Map in change config files changed in the source
