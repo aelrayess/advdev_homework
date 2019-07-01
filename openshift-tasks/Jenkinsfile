@@ -98,7 +98,7 @@ podTemplate(
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${devTag}"
               dc.spec.template.spec.containers[0].env="VERSION=${devTag} (tasks-dev)"
               
-              openshift.apply(dc)
+              //openshift.apply(dc)
               sh "oc set probe dc/tasks --readiness --get-url=http://:8080/ --initial-delay-seconds=30 --timeout-seconds=5 -n ${GUID}-tasks-dev"
               sh "oc set probe dc/tasks --liveness --get-url=http://:8080/ --initial-delay-seconds=60 --failure-threshold=5 --timeout-seconds=5 -n ${GUID}-tasks-dev"
 
