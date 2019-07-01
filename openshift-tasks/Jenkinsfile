@@ -153,7 +153,7 @@ podTemplate(
               // Update the Image on the Production Deployment Config
               def dc = openshift.selector("dc/${destApp}").object()
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
-
+              sh "oc set env dc/tasks VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-prod"
               openshift.apply(dc)
 
               // Update Config Map in change config files changed in the source
@@ -186,7 +186,6 @@ podTemplate(
         script {
           openshift.withCluster() {
             openshift.withProject("${prodProject}") {
-              sh "oc set env dc/tasks VERSION='${prodTag} (${destApp})' -n ${GUID}-tasks-prod"
               def route = openshift.selector("route/tasks").object()
               route.spec.to.name="${destApp}"
               openshift.apply(route)
