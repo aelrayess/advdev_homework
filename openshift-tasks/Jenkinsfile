@@ -99,7 +99,7 @@ podTemplate(
 
               openshift.apply(dc)
               
-              dc.spec.template.spec.containers[0].env="VERSION=${devTag} (tasks-dev)"
+              dc.spec.template.spec.containers[0].env="VERSION=\"${devTag} (tasks-dev)\""
               
               openshift.apply(dc)
               
