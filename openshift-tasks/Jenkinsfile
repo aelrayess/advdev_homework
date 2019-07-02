@@ -92,11 +92,12 @@ podTemplate(
         script {
           openshift.withCluster() {
             openshift.withProject("${devProject}") {
-              def dc = openshift.selector("dc", "tasks").object()
-              //openshift.apply(dc)
+              def dc = openshift.selector("dc" ,"tasks").object()
 
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${devTag}"
               //dc.spec.template.spec.containers[0].env="VERSION=${devTag} (tasks-dev)"
+
+              openshift.apply(dc)
               
               sh "oc set probe dc/tasks --readiness --get-url=http://:8080/ --initial-delay-seconds=30 --timeout-seconds=5 -n ${GUID}-tasks-dev"
               sh "oc set probe dc/tasks --liveness --get-url=http://:8080/ --initial-delay-seconds=60 --failure-threshold=5 --timeout-seconds=5 -n ${GUID}-tasks-dev"
@@ -108,13 +109,12 @@ podTemplate(
               def configmap = openshift.create('configmap', 'tasks-config', '--from-file=./configuration/application-users.properties', '--from-file=./configuration/application-roles.properties' )
 
               // Deploy the development application.
-              openshift.apply(dc)
-
+              
               openshift.selector("dc", "tasks").rollout().latest();
 
               // Wait for application to be deployed
-              //def dc = openshift.selector("dc", "tasks").object()
-              def dc_version = dc.status.latestVersion
+              def dc_dev = openshift.selector("dc", "tasks").object()
+              def dc_version = dc_dev.status.latestVersion
               def rc = openshift.selector("rc", "tasks-${dc_version}").object()
 
               echo "Waiting for ReplicationController tasks-${dc_version} to be ready"
