@@ -93,7 +93,7 @@ podTemplate(
           openshift.withCluster() {
             openshift.withProject("${devProject}") {
               def dc = openshift.selector("dc/tasks").object()
-              openshift.apply(dc)
+              //openshift.apply(dc)
 
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${devTag}"
               //dc.spec.template.spec.containers[0].env="VERSION=${devTag} (tasks-dev)"
@@ -159,10 +159,10 @@ podTemplate(
 
               // Update the Image on the Production Deployment Config
               def dc = openshift.selector("dc/${destApp}").object()
-              openshift.apply(dc)
+              //openshift.apply(dc)
 
               dc.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/${devProject}/tasks:${prodTag}"
-              dc.spec.template.spec.containers[0].env="VERSION=${prodTag} (${destApp})"
+              //dc.spec.template.spec.containers[0].env="VERSION=${prodTag} (${destApp})"
 
 
               sh "oc set probe dc/${destApp} --readiness --get-url=http://:8080/ --initial-delay-seconds=30 --timeout-seconds=5 -n ${GUID}-tasks-prod"
