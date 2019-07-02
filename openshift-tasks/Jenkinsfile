@@ -163,7 +163,7 @@ podTemplate(
 
               openshift.apply(dc)
 
-              sh "oc set env dc/${destApp} \"VERSION=${prodTag} (${destApp})\" -n ${GUID}-tasks-dev"
+              sh "oc set env dc/${destApp} \"VERSION=${prodTag} (${destApp})\" -n ${GUID}-tasks-prod"
               sh "oc set probe dc/${destApp} --readiness --get-url=http://:8080/ --initial-delay-seconds=30 --timeout-seconds=5 -n ${GUID}-tasks-prod"
               sh "oc set probe dc/${destApp} --liveness --get-url=http://:8080/ --initial-delay-seconds=60 --failure-threshold=5 --timeout-seconds=5 -n ${GUID}-tasks-prod"
 
